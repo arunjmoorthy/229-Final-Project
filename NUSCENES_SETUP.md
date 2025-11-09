@@ -139,7 +139,9 @@ python scripts/preprocess_nuscenes.py \
   --split mini
 ```
 
-This converts nuScenes point clouds → range-view format (64×512 images).
+This converts nuScenes point clouds → range-view format (32×1024 images) using the Velodyne HDL-32E geometry.
+
+> **Tip:** Use `config_nuscenes.yaml` for full training runs so the loader expects the 32-ring geometry and automatically picks up the preprocessed NPZ splits.
 
 **Time:** ~10-20 minutes for mini dataset
 
@@ -166,7 +168,7 @@ python scripts/eval_downstream.py \
 After preprocessing, you'll have:
 
 - **~300-400 preprocessed scans** (nuScenes mini)
-- **Range-view format** (64×512 or 64×1024 images)
+- **Range-view format** (32×1024 by default; adjust `--proj_h/--proj_w` if needed)
 - **Semantic labels** for segmentation evaluation
 - **Ready for training!**
 

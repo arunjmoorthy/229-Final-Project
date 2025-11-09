@@ -289,26 +289,42 @@ def create_dataloaders(
     
     loaders = {}
     
-    # Real data (SemanticKITTI)
-    if real_root:
+    data_cfg = config.get('data', {})
+    real_dataset_type = data_cfg.get('real_dataset', 'semantickitti')
+
+    # Resolve dataset roots from config if not provided explicitly
+    if synthetic_root is None:
+        synthetic_root = data_cfg.get('synlidar_root')
+    if real_root is None:
+        if real_dataset_type == 'semantickitti':
+            real_root = data_cfg.get('semantickitti_root')
+        elif real_dataset_type == 'nuscenes_npz':
+            real_root = data_cfg.get('nuscenes_npz_root')
+
+    # Real data
+    if real_dataset_type == 'semantickitti' and real_root:
         splits = get_semantickitti_splits()
-        
+
         train_real = SemanticKITTIDataset(
             root=real_root,
             sequences=splits['train'],
             projection=projection,
             load_labels=True,
-            cache_dir=os.path.join(config['data']['output_root'], 'cache', 'semantickitti_train'),
+            cache_dir=os.path.join(data_cfg['output_root'], 'cache', 'semantickitti_train')
+            if data_cfg.get('output_root')
+            else None,
         )
-        
+
         val_real = SemanticKITTIDataset(
             root=real_root,
             sequences=splits['val'],
             projection=projection,
             load_labels=True,
-            cache_dir=os.path.join(config['data']['output_root'], 'cache', 'semantickitti_val'),
+            cache_dir=os.path.join(data_cfg['output_root'], 'cache', 'semantickitti_val')
+            if data_cfg.get('output_root')
+            else None,
         )
-        
+
         loaders['train_real'] = DataLoader(
             train_real,
             batch_size=config['training']['batch_size'],
@@ -316,7 +332,7 @@ def create_dataloaders(
             num_workers=num_workers,
             pin_memory=True,
         )
-        
+
         loaders['val_real'] = DataLoader(
             val_real,
             batch_size=config['evaluation']['batch_size'],
@@ -324,6 +340,38 @@ def create_dataloaders(
             num_workers=num_workers,
             pin_memory=True,
         )
+
+    elif real_dataset_type == 'nuscenes_npz' and real_root:
+        train_split = data_cfg.get('nuscenes_train_split', 'mini_train')
+        val_split = data_cfg.get('nuscenes_val_split', 'mini_val')
+
+        train_dir = Path(real_root) / train_split
+        val_dir = Path(real_root) / val_split
+
+        train_real = RangeViewNPZDataset(root_dir=str(train_dir))
+        val_real = RangeViewNPZDataset(root_dir=str(val_dir))
+
+        loaders['train_real'] = DataLoader(
+            train_real,
+            batch_size=config['training']['batch_size'],
+            shuffle=True,
+            num_workers=num_workers,
+            pin_memory=True,
+        )
+
+        loaders['val_real'] = DataLoader(
+            val_real,
+            batch_size=config['evaluation']['batch_size'],
+            shuffle=False,
+            num_workers=num_workers,
+            pin_memory=True,
+        )
+    elif real_root is None:
+        raise FileNotFoundError(
+            f"Real dataset root not provided for type '{real_dataset_type}'."
+        )
+    else:
+        raise ValueError(f"Unsupported real dataset type: {real_dataset_type}")
     
     # Synthetic data
     if synthetic_root:
@@ -331,16 +379,20 @@ def create_dataloaders(
             root=synthetic_root,
             split='train',
             projection=projection,
-            cache_dir=os.path.join(config['data']['output_root'], 'cache', 'synlidar_train'),
+            cache_dir=os.path.join(data_cfg['output_root'], 'cache', 'synlidar_train')
+            if data_cfg.get('output_root')
+            else None,
         )
-        
+
         val_syn = SynLiDARDataset(
             root=synthetic_root,
             split='val',
             projection=projection,
-            cache_dir=os.path.join(config['data']['output_root'], 'cache', 'synlidar_val'),
+            cache_dir=os.path.join(data_cfg['output_root'], 'cache', 'synlidar_val')
+            if data_cfg.get('output_root')
+            else None,
         )
-        
+
         loaders['train_syn'] = DataLoader(
             train_syn,
             batch_size=config['training']['batch_size'],
@@ -348,7 +400,7 @@ def create_dataloaders(
             num_workers=num_workers,
             pin_memory=True,
         )
-        
+
         loaders['val_syn'] = DataLoader(
             val_syn,
             batch_size=config['evaluation']['batch_size'],
@@ -356,6 +408,6 @@ def create_dataloaders(
             num_workers=num_workers,
             pin_memory=True,
         )
-    
+
     return loaders
 
