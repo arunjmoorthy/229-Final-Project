@@ -39,10 +39,11 @@ class RangeProjection:
         self.min_range = min_range
         
     def project(
-        self, 
-        points: np.ndarray, 
+        self,
+        points: np.ndarray,
         intensity: Optional[np.ndarray] = None,
         labels: Optional[np.ndarray] = None,
+        ring_indices: Optional[np.ndarray] = None,
     ) -> Dict[str, np.ndarray]:
         """
         Project point cloud to range view.
@@ -51,6 +52,9 @@ class RangeProjection:
             points: (N, 3) array of [x, y, z] coordinates
             intensity: (N,) array of intensity values (optional)
             labels: (N,) array of semantic labels (optional)
+            ring_indices: (N,) array of laser ring indices (optional). If provided,
+                these override the pitch-based vertical mapping and allow sensors
+                such as the nuScenes HDL-32E to align perfectly with the output grid.
             
         Returns:
             Dictionary containing:
@@ -73,6 +77,8 @@ class RangeProjection:
             intensity = intensity[valid_range]
         if labels is not None:
             labels = labels[valid_range]
+        if ring_indices is not None:
+            ring_indices = ring_indices[valid_range]
             
         # Calculate pitch and yaw
         x, y, z = points[:, 0], points[:, 1], points[:, 2]
@@ -85,10 +91,24 @@ class RangeProjection:
         proj_x = np.floor(proj_x).astype(np.int32)
         proj_x = np.clip(proj_x, 0, self.proj_w - 1)
         
-        # Pitch: fov_down to fov_up -> 0 to H-1
-        proj_y = (1.0 - (pitch - self.fov_down) / self.fov) * (self.proj_h - 1)
-        proj_y = np.floor(proj_y).astype(np.int32)
-        proj_y = np.clip(proj_y, 0, self.proj_h - 1)
+        if ring_indices is not None:
+            # Map provided ring indices to projection rows. nuScenes provides
+            # integer ring IDs (0-indexed). We rescale them if the requested
+            # projection height differs from the number of unique rings.
+            ring_indices = ring_indices.astype(np.float32)
+            ring_min = ring_indices.min()
+            ring_max = ring_indices.max()
+            if ring_max > ring_min:
+                ring_norm = (ring_indices - ring_min) / (ring_max - ring_min)
+            else:
+                ring_norm = np.zeros_like(ring_indices)
+            proj_y = np.floor(ring_norm * (self.proj_h - 1)).astype(np.int32)
+            proj_y = np.clip(proj_y, 0, self.proj_h - 1)
+        else:
+            # Pitch: fov_down to fov_up -> 0 to H-1
+            proj_y = (1.0 - (pitch - self.fov_down) / self.fov) * (self.proj_h - 1)
+            proj_y = np.floor(proj_y).astype(np.int32)
+            proj_y = np.clip(proj_y, 0, self.proj_h - 1)
         
         # Initialize range image
         range_img = np.zeros((self.proj_h, self.proj_w), dtype=np.float32)

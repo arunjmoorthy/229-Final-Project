@@ -1,0 +1,97 @@
+# LiDAR Sim2Real Configuration (nuScenes real data)
+
+# Dataset paths
+# Adjust paths to your local machine. Preprocess nuScenes mini into NPZs first.
+data:
+  real_dataset: "nuscenes_npz"
+  synthetic_dataset: "synlidar"
+  nuscenes_npz_root: "./data/processed/nuscenes_mini"
+  nuscenes_train_split: "mini_train"
+  nuscenes_val_split: "mini_val"
+  synlidar_root: "./data/processed/synlidar"
+  output_root: "./data/processed"
+
+# Sensor parameters (nuScenes uses Velodyne HDL-32E)
+sensor:
+  n_rings: 32
+  n_azimuth: 1024
+  fov_up: 10.67
+  fov_down: -30.67
+  max_range: 80.0
+  min_range: 0.5
+
+# Range view channels
+channels:
+  input: ["range", "intensity", "mask"]
+  output: ["range", "intensity", "mask"]
+
+# Model architecture
+model:
+  type: "unet"
+  in_channels: 4  # range, intensity, mask, beam_angle
+  out_channels: 3  # range, intensity, mask
+  base_channels: 64
+  channel_multipliers: [1, 2, 4, 8]
+  num_res_blocks: 2
+  attention_resolutions: [16, 8]
+  dropout: 0.1
+  use_circular_padding: true
+
+# Diffusion parameters
+diffusion:
+  timesteps: 1000
+  beta_schedule: "linear"
+  beta_start: 0.0001
+  beta_end: 0.02
+  sampling_steps: 50
+  cfg_scale: 3.0
+
+# Training
+training:
+  batch_size: 16
+  num_epochs: 100
+  learning_rate: 0.0002
+  weight_decay: 0.0001
+  lr_scheduler: "cosine"
+  warmup_epochs: 5
+  gradient_clip: 1.0
+  mixed_precision: true
+  num_workers: 8
+  save_interval: 5
+  eval_interval: 1
+  log_interval: 100
+
+# Data augmentation
+augmentation:
+  use_calibration: true
+  dropout_prob: 0.1
+  intensity_noise_std: 0.05
+  range_noise_std: 0.02
+  ring_dropout_prob: 0.05
+
+# Loss weights
+loss:
+  l1_weight: 1.0
+  l2_weight: 0.0
+  perceptual_weight: 0.1
+  adversarial_weight: 0.01
+
+# Evaluation
+evaluation:
+  batch_size: 32
+  num_samples: 1000
+  metrics: ["frid", "fpd", "mmd"]
+
+# Downstream segmentation
+segmentation:
+  num_classes: 16  # nuScenes lidarseg
+  model: "rangenet"
+  learning_rate: 0.001
+  num_epochs: 50
+
+# Compute
+compute:
+  gpu: "A100"
+  gpu_memory: "80GB"
+  timeout: 86400
+  retries: 2

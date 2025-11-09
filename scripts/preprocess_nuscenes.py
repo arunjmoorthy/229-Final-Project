@@ -13,6 +13,7 @@ Outputs (default):
   data/processed/nuscenes/mini_val/*.npz
 
 Each NPZ contains: range, intensity, mask, beam_angle, (optional) labels
+Default projection uses the nuScenes Velodyne HDL-32E geometry (32×1024, fov +10.67°/-30.67°).
 """
 
 import os
@@ -93,6 +94,7 @@ def preprocess_split(
             # pc.points: shape (5, N): x, y, z, intensity, ring_index
             points = pc.points[:3, :].T.astype(np.float32)
             intensity = pc.points[3, :].astype(np.float32)
+            rings = pc.points[4, :].astype(np.int32) if pc.points.shape[0] > 4 else None
 
             # Load labels if available
             labels = None
@@ -106,7 +108,12 @@ def preprocess_split(
                     labels = None
 
             # Project
-            proj = projection.project(points=points, intensity=intensity, labels=labels)
+            proj = projection.project(
+                points=points,
+                intensity=intensity,
+                labels=labels,
+                ring_indices=rings,
+            )
 
             # Save
             out_name = f"{sd_rec['token']}.npz"
@@ -139,13 +146,13 @@ def main():
         help="Directory to write NPZs",
     )
     parser.add_argument(
-        "--proj_h", type=int, default=64, help="Range view height (rings)"
+        "--proj_h", type=int, default=32, help="Range view height (rings)"
     )
     parser.add_argument(
         "--proj_w", type=int, default=1024, help="Range view width (azimuth)"
     )
-    parser.add_argument("--fov_up", type=float, default=3.0)
-    parser.add_argument("--fov_down", type=float, default=-25.0)
+    parser.add_argument("--fov_up", type=float, default=10.67)
+    parser.add_argument("--fov_down", type=float, default=-30.67)
     parser.add_argument("--max_range", type=float, default=80.0)
     parser.add_argument("--min_range", type=float, default=0.5)
     parser.add_argument(

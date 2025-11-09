@@ -71,10 +71,21 @@ def main():
         num_workers=config['training'].get('num_workers', 4),
     )
     
-    print(f"Train synthetic: {len(dataloaders['train_syn'].dataset)} samples")
-    print(f"Train real: {len(dataloaders['train_real'].dataset)} samples")
-    print(f"Val synthetic: {len(dataloaders['val_syn'].dataset)} samples")
-    print(f"Val real: {len(dataloaders['val_real'].dataset)} samples")
+    def _describe_loader(name: str, pretty: str):
+        loader = dataloaders.get(name)
+        if loader is None:
+            print(f"{pretty}: unavailable (check config paths)")
+        else:
+            try:
+                length = len(loader.dataset)
+            except AttributeError:
+                length = len(loader)
+            print(f"{pretty}: {length} samples")
+
+    _describe_loader('train_syn', 'Train synthetic')
+    _describe_loader('train_real', 'Train real')
+    _describe_loader('val_syn', 'Val synthetic')
+    _describe_loader('val_real', 'Val real')
     
     # Create model
     print("\nCreating model...")
