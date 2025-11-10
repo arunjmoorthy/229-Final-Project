@@ -9,12 +9,12 @@ data:
   carla_root: "/Users/arunmoorthy/Junior Year/CS 229/Final Project/data/raw/CARLA"
   output_root: "/Users/arunmoorthy/Junior Year/CS 229/Final Project/data/processed"
   nuscenes_raw_root: "/Users/arunmoorthy/Junior Year/CS 229/Final Project/data/raw/nuscenes"
-  nuscenes_npz_root: "/Users/arunmoorthy/Junior Year/CS 229/Final Project/data/processed/nuscenes"
+  nuscenes_npz_root: "/Users/arunmoorthy/Junior Year/CS 229/Final Project/data/processed/nuscenes_mini"
   
 # Sensor parameters (Velodyne HDL-64E for SemanticKITTI)
 sensor:
   n_rings: 64
-  n_azimuth: 1024  # Can be 1024 or 2048
+  n_azimuth: 512  # Matching nuScenes resolution
   fov_up: 3.0  # degrees
   fov_down: -25.0  # degrees
   max_range: 80.0  # meters
@@ -48,8 +48,8 @@ diffusion:
   
 # Training
 training:
-  batch_size: 16
-  num_epochs: 100
+  batch_size: 8
+  num_epochs: 2
   learning_rate: 0.0002
   weight_decay: 0.0001
   lr_scheduler: "cosine"

@@ -1,0 +1,44 @@
+/Users/arunmoorthy/Junior Year/CS 229/Final Project/train/trainer.py:98: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = GradScaler() if self.use_amp else None
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/torch/cuda/amp/grad_scaler.py:31: UserWarning: torch.cuda.amp.GradScaler is enabled, but CUDA is not available.  Disabling.
+  super().__init__(
+============================================================
+🚀 Sim→Real LiDAR Translation Training
+============================================================
+Config: config.yaml
+Stage:  direct
+Device: cpu
+============================================================
+
+📂 Loading datasets...
+
+✓ Checking data paths:
+  ✓ Synthetic Train: 794 scans
+  ✓ Synthetic Val: 500 scans
+  ✓ Real Train: 323 scans
+  ✓ Real Val: 81 scans
+
+📊 Creating datasets...
+  Training:   794 synthetic, 323 real scans
+  Validation: 500 synthetic, 81 real scans
+
+⚠️  Using subset of 50 samples for testing
+
+🔄 Creating dataloaders...
+  Batch size: 8
+  Workers:    0
+  Train batches: 7 synthetic, 7 real
+  Val batches:   2 synthetic, 2 real
+
+🏗️  Building model...
+  Model: RangeViewUNet (direct translation)
+  Parameters: 49,772,611
+
+🎓 Setting up trainer...
+Traceback (most recent call last):
+  File "/Users/arunmoorthy/Junior Year/CS 229/Final Project/train_sim2real.py", line 234, in <module>
+    main()
+  File "/Users/arunmoorthy/Junior Year/CS 229/Final Project/train_sim2real.py", line 203, in main
+    print(f"  Optimizer:  {config['training']['optimizer']}")
+                           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+KeyError: 'optimizer'
