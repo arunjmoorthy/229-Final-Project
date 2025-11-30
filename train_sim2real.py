@@ -127,6 +127,7 @@ def main():
         shuffle=True,
         num_workers=num_workers,
         pin_memory=(args.device == 'cuda'),
+        drop_last=True,
     )
     
     train_loader_real = DataLoader(
@@ -135,6 +136,7 @@ def main():
         shuffle=True,
         num_workers=num_workers,
         pin_memory=(args.device == 'cuda'),
+        drop_last=True,
     )
     
     val_loader_syn = DataLoader(

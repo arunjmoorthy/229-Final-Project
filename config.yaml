@@ -49,7 +49,7 @@ diffusion:
 # Training
 training:
   batch_size: 8
-  num_epochs: 2
+  num_epochs: 25
   learning_rate: 0.0002
   weight_decay: 0.0001
   lr_scheduler: "cosine"

@@ -67,7 +67,7 @@ class Trainer:
         self.save_interval = train_cfg.get('save_interval', 5)
         self.eval_interval = train_cfg.get('eval_interval', 1)
         self.log_interval = train_cfg.get('log_interval', 100)
-        self.use_amp = train_cfg.get('mixed_precision', True)
+        self.use_amp = train_cfg.get('mixed_precision', True) and device.startswith('cuda')
         
         # Loss
         if is_diffusion:
