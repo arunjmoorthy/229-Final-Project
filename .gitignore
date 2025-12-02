@@ -51,7 +51,6 @@ data/processed/
 *.pth
 *.ckpt
 checkpoints/
-outputs/
 
 # Logs
 logs/

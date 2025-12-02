@@ -1,0 +1,52 @@
+{
+  "settings": {
+    "real_dir": "data/processed/nuscenes_mini/mini_val",
+    "synthetic_dir": "data/processed/synlidar/val",
+    "translated_dir": "outputs/sim2real/direct/translated_synlidar_val",
+    "max_samples": 200
+  },
+  "raw_vs_real": {
+    "frid": 25.042490709222754,
+    "mmd_rbf": 1.4072676034985523,
+    "mmd_linear": 5.0024566604467005,
+    "range_mae": 13.375557899475098,
+    "range_std_diff": 11.749926567077637,
+    "intensity_mae": 0.1875162422657013,
+    "intensity_std_diff": 0.015426777303218842
+  },
+  "translated_vs_real": {
+    "frid": 0.03117278204562558,
+    "mmd_rbf": 0.17521252578911756,
+    "mmd_linear": 0.17590593559864381,
+    "range_mae": 0.05977190285921097,
+    "range_std_diff": 0.014899171888828278,
+    "intensity_mae": 0.049682945013046265,
+    "intensity_std_diff": 0.03509249910712242
+  },
+  "basic_stats": {
+    "real": {
+      "num_samples": 81,
+      "num_valid_pixels": 853496,
+      "range_mean": 0.13879333436489105,
+      "range_std": 0.1259034276008606,
+      "intensity_mean": 0.09750431030988693,
+      "intensity_std": 0.11867142468690872
+    },
+    "synthetic": {
+      "num_samples": 200,
+      "num_valid_pixels": 6404491,
+      "range_mean": 13.732621192932129,
+      "range_std": 11.803086280822754,
+      "intensity_mean": 0.22396549582481384,
+      "intensity_std": 0.09178239852190018
+    },
+    "translated": {
+      "num_samples": 200,
+      "num_valid_pixels": 6395580,
+      "range_mean": 0.10700417309999466,
+      "range_std": 0.08079874515533447,
+      "intensity_mean": 0.0830359011888504,
+      "intensity_std": 0.04489387199282646
+    }
+  }
+}
