@@ -1,7 +1,3 @@
-"""
-Learn sensor profile (dropout, intensity patterns) from real data.
-"""
-
 import sys
 import argparse
 import numpy as np

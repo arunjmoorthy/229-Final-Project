@@ -1,7 +1,4 @@
-"""
-Quick test training script - runs 1 epoch on a small subset of data to verify everything works.
-Run this before full GPU training.
-"""
+"Runs one epoch"
 
 import argparse
 import yaml

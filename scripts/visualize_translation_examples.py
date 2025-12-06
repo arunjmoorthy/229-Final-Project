@@ -1,16 +1,3 @@
-#!/usr/bin/env python3
-"""
-Create side-by-side figures for synthetic vs translated vs real range views.
-
-Example:
-    python3 scripts/visualize_translation_examples.py \
-        --synthetic_dir data/processed/synlidar/val \
-        --translated_dir outputs/sim2real/direct/translated_synlidar_val \
-        --real_dir data/processed/nuscenes_mini/mini_val \
-        --num_examples 4 \
-        --output_dir outputs/sim2real/direct/example_comparisons
-"""
-
 import argparse
 import random
 import sys

@@ -1,8 +1,3 @@
-"""
-Evaluate downstream segmentation performance with different data regimes.
-Compares: Real-only, Real+Raw-Synthetic, Real+Translated-Synthetic.
-"""
-
 import sys
 import argparse
 import torch

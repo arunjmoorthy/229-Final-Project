@@ -1,20 +1,3 @@
-#!/usr/bin/env python3
-"""
-Visualize the full Sim→Real data pipeline on a single example.
-
-What this script shows (step by step):
-1. RAW SYNTHETIC (SynLiDAR) point cloud in 3D.
-2. SYNTHETIC RANGE VIEW created by projecting that raw point cloud.
-3. REAL RANGE VIEW from nuScenes-mini (what “real” looks like).
-4. (Optional) TRANSLATED RANGE VIEW from a trained UNet checkpoint.
-
-This lets you *see*:
-- What raw synthetic LiDAR looks like in XYZ.
-- How we turn it into a range / intensity / mask image.
-- How that synthetic range-view compares to a real sensor’s range-view.
-- Optionally, how a trained model changes the synthetic scan to look more real.
-"""
-
 import argparse
 import sys
 from pathlib import Path

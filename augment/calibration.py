@@ -1,8 +1,3 @@
-"""
-Physics-based calibrated augmentation for LiDAR range views.
-Applies learned dropout, intensity falloff, and ring artifacts.
-"""
-
 import numpy as np
 import torch
 from typing import Dict, Optional

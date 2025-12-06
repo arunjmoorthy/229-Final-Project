@@ -1,8 +1,3 @@
-"""
-Main training script for LiDAR Sim2Real translation.
-Can run locally or on Modal.
-"""
-
 import argparse
 import yaml
 import torch

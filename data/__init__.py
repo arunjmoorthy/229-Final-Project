@@ -1,5 +1,3 @@
-"""Data loading and preprocessing utilities."""
-
 from .range_projection import RangeProjection, load_bin_point_cloud, load_bin_labels
 from .loaders import (
     SynLiDARDataset,

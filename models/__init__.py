@@ -1,5 +1,3 @@
-"""Model architectures."""
-
 from .unet import RangeViewUNet, CircularPad2d
 from .diffusion import DiffusionModel, get_beta_schedule
 from .segmentation import RangeNetSegmentation, SegmentationTrainer

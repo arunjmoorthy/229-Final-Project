@@ -1,8 +1,3 @@
-"""
-Range-view projection utilities for LiDAR point clouds.
-Handles projection from 3D point cloud to 2D range image with proper masking.
-"""
-
 import numpy as np
 import torch
 from typing import Tuple, Optional, Dict

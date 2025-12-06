@@ -1,8 +1,3 @@
-"""
-UNet architecture with circular padding for range-view translation.
-Handles 360° azimuth wrapping properly.
-"""
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

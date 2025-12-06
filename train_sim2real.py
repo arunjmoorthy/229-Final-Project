@@ -1,16 +1,3 @@
-#!/usr/bin/env python3
-"""
-Train Sim→Real LiDAR Translation Model
-
-This script trains a model to translate SYNTHETIC LiDAR scans to REALISTIC LiDAR scans.
-
-Input:  Synthetic LiDAR (from SynLiDAR) - "too clean", unrealistic
-Output: Real LiDAR (from nuScenes) - realistic sensor characteristics
-
-The goal is to make synthetic data look more realistic so it can be used for training
-perception models (segmentation, detection, etc.) without domain gap.
-"""
-
 import argparse
 import yaml
 from pathlib import Path

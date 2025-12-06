@@ -1,22 +1,3 @@
-#!/usr/bin/env python3
-"""
-Quantify how close translated synthetic scans are to real data.
-
-Usage example:
-    python3 scripts/eval_translation_quality.py \
-        --real_dir data/processed/nuscenes_mini/mini_val \
-        --synthetic_dir data/processed/synlidar/val \
-        --translated_dir outputs/sim2real/direct/translated_synlidar_val \
-        --max_samples 200 \
-        --output_json outputs/sim2real/direct/translation_metrics.json \
-        --plot_dir outputs/sim2real/direct/translation_plots
-
-This script outputs:
-  1. FRID + MMD metrics for (raw synthetic vs real) and (translated vs real).
-  2. Simple range/intensity statistics (mean/std) on valid pixels.
-  3. Optional histograms comparing range/intensity distributions.
-"""
-
 import argparse
 import json
 import sys

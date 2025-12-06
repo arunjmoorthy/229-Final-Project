@@ -1,7 +1,3 @@
-"""
-Batch translation of synthetic scans to realistic scans.
-"""
-
 import sys
 import argparse
 import torch

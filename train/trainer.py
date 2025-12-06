@@ -1,7 +1,3 @@
-"""
-Main training loop for Sim2Real translation.
-"""
-
 import os
 import torch
 import torch.nn as nn

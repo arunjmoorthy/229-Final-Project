@@ -1,7 +1,3 @@
-"""
-Dataset loaders for SemanticKITTI, SynLiDAR, and CARLA.
-"""
-
 import os
 import numpy as np
 import torch

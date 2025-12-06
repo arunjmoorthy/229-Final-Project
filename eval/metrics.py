@@ -1,8 +1,3 @@
-"""
-Evaluation metrics for LiDAR distribution comparison.
-Implements FRID (Fréchet Range Image Distance), FPD (Fréchet Point Distance), and MMD.
-"""
-
 import numpy as np
 import torch
 import torch.nn as nn

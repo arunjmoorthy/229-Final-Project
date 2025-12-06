@@ -1,8 +1,3 @@
-"""
-Modal deployment for GPU training and inference.
-Run training on A100 GPUs with persistent storage.
-"""
-
 import modal
 import os
 from pathlib import Path

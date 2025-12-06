@@ -1,8 +1,3 @@
-"""
-Range-view segmentation model for downstream evaluation.
-Simple RangeNet-like architecture.
-"""
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

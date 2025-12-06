@@ -1,21 +1,3 @@
-"""
-Preprocess nuScenes (mini/trainval) to range-view NPZs.
-
-Requirements:
-- pip install nuscenes-devkit  (see: https://github.com/nutonomy/nuscenes-devkit)
-- Download nuScenes or nuScenes-mini archives and extract to a dataroot like:
-    /Users/arunmoorthy/Junior Year/CS 229/Final Project/data/raw/nuscenes
-  with folders: samples/, sweeps/, maps/, v1.0-mini/ (or v1.0-trainval/)
-- (Optional) Download nuScenes-lidarseg (mini) and extract 'lidarseg' + 'v1.0-mini' into same dataroot.
-
-Outputs (default):
-  data/processed/nuscenes/mini_train/*.npz
-  data/processed/nuscenes/mini_val/*.npz
-
-Each NPZ contains: range, intensity, mask, beam_angle, (optional) labels
-Default projection uses the nuScenes Velodyne HDL-32E geometry (32×1024, fov +10.67°/-30.67°).
-"""
-
 import os
 import sys
 import argparse

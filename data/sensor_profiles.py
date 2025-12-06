@@ -1,8 +1,3 @@
-"""
-Sensor profile learning and calibration utilities.
-Learns dropout patterns, intensity falloff, and ring artifacts from real data.
-"""
-
 import numpy as np
 import json
 from pathlib import Path

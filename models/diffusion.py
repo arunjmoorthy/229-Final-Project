@@ -1,8 +1,3 @@
-"""
-Diffusion model wrapper for range-view translation.
-Implements DDPM with classifier-free guidance.
-"""
-
 import torch
 import torch.nn as nn
 import numpy as np
