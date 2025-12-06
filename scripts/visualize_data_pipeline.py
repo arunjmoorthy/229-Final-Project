@@ -26,13 +26,8 @@ import torch
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.preprocess_synlidar import (  # type: ignore  # noqa: E402
-    load_synlidar_scan,
-    load_synlidar_labels,
-    RangeProjection as SynLiDARRangeProjection,
-)
 from data.loaders import RangeViewNPZDataset  # type: ignore  # noqa: E402
-from data.range_projection import RangeProjection  # type: ignore  # noqa: E402
+from data.range_projection import RangeProjection, load_bin_point_cloud, load_bin_labels  # type: ignore  # noqa: E402
 from eval.visualize import (  # type: ignore  # noqa: E402
     visualize_3d_point_cloud,
     visualize_range_view,
@@ -208,9 +203,7 @@ def main():
     bin_path = find_example_synlidar_scan(syn_raw_root, args.syn_sequence)
     print(f"  Using raw scan: {bin_path}")
 
-    points = load_synlidar_scan(bin_path)  # (N, 4)
-    xyz = points[:, :3]
-    intensity = points[:, 3]
+    xyz, intensity = load_bin_point_cloud(str(bin_path))
 
     print(f"  Num points: {xyz.shape[0]}")
     print("  Visualizing 3D point cloud...")
@@ -228,13 +221,13 @@ def main():
     # Use the same projection as preprocess_synlidar (configured inside that script).
     # We reuse its RangeProjection class but with default settings; for exact
     # match you can pass sensor config via args if needed.
-    projection = SynLiDARRangeProjection()
+    projection = RangeProjection()
     labels = None
     label_path = bin_path.parent.parent / "labels" / f"{bin_path.stem}.label"
     if label_path.exists():
-        labels = load_synlidar_labels(label_path)
+        labels = load_bin_labels(str(label_path))
 
-    proj = projection.project(points, labels)
+    proj = projection.project(xyz, intensity=intensity, labels=labels)
 
     visualize_range_view(
         range_img=proj["range"],

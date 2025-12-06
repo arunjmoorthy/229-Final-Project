@@ -67,7 +67,7 @@ def main():
     dataloaders = create_dataloaders(
         config=config,
         synthetic_root=config['data'].get('synlidar_root'),
-        real_root=config['data'].get('semantickitti_root'),
+        real_root=config['data'].get('nuscenes_npz_root'),
         num_workers=config['training'].get('num_workers', 4),
     )
     

@@ -4,14 +4,13 @@
 # For local training, use these paths:
 # For Modal training, these will be overridden to /data/...
 data:
-  semantickitti_root: "/Users/arunmoorthy/Junior Year/CS 229/Final Project/data/processed"
   synlidar_root: "/Users/arunmoorthy/Junior Year/CS 229/Final Project/data/processed"
   carla_root: "/Users/arunmoorthy/Junior Year/CS 229/Final Project/data/raw/CARLA"
   output_root: "/Users/arunmoorthy/Junior Year/CS 229/Final Project/data/processed"
   nuscenes_raw_root: "/Users/arunmoorthy/Junior Year/CS 229/Final Project/data/raw/nuscenes"
   nuscenes_npz_root: "/Users/arunmoorthy/Junior Year/CS 229/Final Project/data/processed/nuscenes_mini"
   
-# Sensor parameters (Velodyne HDL-64E for SemanticKITTI)
+# Sensor parameters
 sensor:
   n_rings: 64
   n_azimuth: 512  # Matching nuScenes resolution

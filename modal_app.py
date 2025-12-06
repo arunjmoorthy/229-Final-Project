@@ -85,7 +85,7 @@ def train_translator(
         config = yaml.safe_load(f)
     
     # Update paths for Modal volumes
-    config['data']['semantickitti_root'] = f"{DATA_DIR}/SemanticKITTI"
+    config['data']['nuscenes_npz_root'] = f"{DATA_DIR}/nuscenes_mini"
     config['data']['synlidar_root'] = f"{DATA_DIR}/SynLiDAR"
     config['data']['output_root'] = DATA_DIR
     
@@ -93,7 +93,7 @@ def train_translator(
     dataloaders = create_dataloaders(
         config,
         synthetic_root=config['data']['synlidar_root'],
-        real_root=config['data']['semantickitti_root'],
+        real_root=config['data']['nuscenes_npz_root'],
         num_workers=4,
     )
     
@@ -349,7 +349,7 @@ def main(
         
     elif command == "eval":
         metrics = evaluate_metrics.remote(
-            real_dir="semantickitti_val",
+            real_dir="nuscenes_mini/mini_val",
             generated_dir="translated",
         )
         print("Metrics:", metrics)

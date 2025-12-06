@@ -11,7 +11,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from data.loaders import SemanticKITTIDataset, SynLiDARDataset, get_semantickitti_splits, RangeViewNPZDataset
+from data.loaders import SynLiDARDataset, RangeViewNPZDataset
 from data.range_projection import RangeProjection
 from models.segmentation import RangeNetSegmentation, SegmentationTrainer
 from torch.utils.data import DataLoader, ConcatDataset
@@ -21,7 +21,7 @@ def train_segmentation(
     config_path: str,
     data_regime: str = 'real',  # 'real', 'real+raw', 'real+translated'
     synthetic_dir: str = None,
-    dataset: str = 'semantickitti',  # 'semantickitti' or 'nuscenes_npz'
+    dataset: str = 'nuscenes_npz',  # 'nuscenes_npz'
     output_dir: str = './outputs/segmentation',
 ):
     """
@@ -48,24 +48,7 @@ def train_segmentation(
         min_range=sensor_cfg['min_range'],
     )
     
-    if dataset == 'semantickitti':
-        # Get splits
-        splits = get_semantickitti_splits()
-        # Load real data (SemanticKITTI)
-        print(f"Loading real data (SemanticKITTI)...")
-        real_train = SemanticKITTIDataset(
-            root=config['data']['semantickitti_root'],
-            sequences=splits['train'],
-            projection=projection,
-            load_labels=True,
-        )
-        real_val = SemanticKITTIDataset(
-            root=config['data']['semantickitti_root'],
-            sequences=splits['val'],
-            projection=projection,
-            load_labels=True,
-        )
-    elif dataset == 'nuscenes_npz':
+    if dataset == 'nuscenes_npz':
         # Expect preprocessed NPZs at config['data']['nuscenes_npz_root']
         print(f"Loading real data (nuScenes NPZ)...")
         npz_root = config['data'].get('nuscenes_npz_root', './data/processed/nuscenes')
@@ -207,8 +190,8 @@ def main():
     parser.add_argument(
         "--dataset",
         type=str,
-        choices=['semantickitti', 'nuscenes_npz'],
-        default='semantickitti',
+        choices=['nuscenes_npz'],
+        default='nuscenes_npz',
         help="Real dataset source"
     )
     parser.add_argument(

@@ -10,97 +10,7 @@ from pathlib import Path
 from typing import Optional, Tuple, Dict, List
 import yaml
 
-from .range_projection import RangeProjection, load_kitti_point_cloud, load_kitti_labels
-
-
-class SemanticKITTIDataset(Dataset):
-    """SemanticKITTI dataset loader with range-view projection."""
-    
-    def __init__(
-        self,
-        root: str,
-        sequences: List[str],
-        projection: RangeProjection,
-        load_labels: bool = True,
-        cache_dir: Optional[str] = None,
-    ):
-        """
-        Args:
-            root: Path to SemanticKITTI root directory
-            sequences: List of sequence IDs (e.g., ["00", "01"])
-            projection: RangeProjection instance
-            load_labels: Whether to load semantic labels
-            cache_dir: Directory to cache preprocessed range views
-        """
-        self.root = Path(root)
-        self.sequences = sequences
-        self.projection = projection
-        self.load_labels = load_labels
-        self.cache_dir = Path(cache_dir) if cache_dir else None
-        
-        if self.cache_dir:
-            self.cache_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Build file list
-        self.scan_files = []
-        self.label_files = []
-        
-        for seq in sequences:
-            seq_path = self.root / "sequences" / seq
-            scan_path = seq_path / "velodyne"
-            label_path = seq_path / "labels"
-            
-            if not scan_path.exists():
-                print(f"Warning: {scan_path} does not exist, skipping sequence {seq}")
-                continue
-                
-            scans = sorted(scan_path.glob("*.bin"))
-            self.scan_files.extend(scans)
-            
-            if load_labels and label_path.exists():
-                labels = sorted(label_path.glob("*.label"))
-                self.label_files.extend(labels)
-                
-        print(f"Loaded {len(self.scan_files)} scans from sequences {sequences}")
-        
-    def __len__(self) -> int:
-        return len(self.scan_files)
-    
-    def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
-        scan_file = self.scan_files[idx]
-        
-        # Check cache
-        if self.cache_dir:
-            cache_file = self.cache_dir / f"{scan_file.stem}.npz"
-            if cache_file.exists():
-                data = np.load(cache_file)
-                return self._to_torch(data)
-        
-        # Load point cloud
-        points, intensity = load_kitti_point_cloud(str(scan_file))
-        
-        # Load labels if available
-        labels = None
-        if self.load_labels and len(self.label_files) > idx:
-            labels = load_kitti_labels(str(self.label_files[idx]))
-        
-        # Project to range view
-        range_data = self.projection.project(points, intensity, labels)
-        
-        # Cache if enabled
-        if self.cache_dir:
-            np.savez_compressed(cache_file, **range_data)
-        
-        return self._to_torch(range_data)
-    
-    def _to_torch(self, data: Dict) -> Dict[str, torch.Tensor]:
-        """Convert numpy arrays to torch tensors."""
-        result = {}
-        for key, val in data.items():
-            if isinstance(val, dict):
-                val = val['arr_0'] if 'arr_0' in val else list(val.values())[0]
-            result[key] = torch.from_numpy(np.array(val))
-        return result
+from .range_projection import RangeProjection, load_bin_point_cloud, load_bin_labels
 
 
 class SynLiDARDataset(Dataset):
@@ -157,12 +67,12 @@ class SynLiDARDataset(Dataset):
                 return self._to_torch(data)
         
         # Load point cloud
-        points, intensity = load_kitti_point_cloud(str(scan_file))
+        points, intensity = load_bin_point_cloud(str(scan_file))
         
         # Load labels if available
         labels = None
         if len(self.label_files) > idx:
-            labels = load_kitti_labels(str(self.label_files[idx]))
+            labels = load_bin_labels(str(self.label_files[idx]))
         
         # Project to range view
         range_data = self.projection.project(points, intensity, labels)
@@ -249,15 +159,6 @@ class RangeViewNPZDataset(Dataset):
         return sample
 
 
-def get_semantickitti_splits() -> Dict[str, List[str]]:
-    """Get standard SemanticKITTI train/val/test splits."""
-    return {
-        'train': [f"{i:02d}" for i in [0, 1, 2, 3, 4, 5, 6, 7, 9, 10]],
-        'val': ['08'],
-        'test': [f"{i:02d}" for i in [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]],
-    }
-
-
 def create_dataloaders(
     config: dict,
     synthetic_root: Optional[str] = None,
@@ -270,7 +171,7 @@ def create_dataloaders(
     Args:
         config: Configuration dictionary
         synthetic_root: Path to synthetic data root
-        real_root: Path to real data root (SemanticKITTI)
+        real_root: Path to real data root (nuScenes NPZ)
         num_workers: Number of dataloader workers
         
     Returns:
@@ -290,58 +191,16 @@ def create_dataloaders(
     loaders = {}
     
     data_cfg = config.get('data', {})
-    real_dataset_type = data_cfg.get('real_dataset', 'semantickitti')
+    real_dataset_type = data_cfg.get('real_dataset', 'nuscenes_npz')
 
     # Resolve dataset roots from config if not provided explicitly
     if synthetic_root is None:
         synthetic_root = data_cfg.get('synlidar_root')
     if real_root is None:
-        if real_dataset_type == 'semantickitti':
-            real_root = data_cfg.get('semantickitti_root')
-        elif real_dataset_type == 'nuscenes_npz':
-            real_root = data_cfg.get('nuscenes_npz_root')
+        real_root = data_cfg.get('nuscenes_npz_root')
 
     # Real data
-    if real_dataset_type == 'semantickitti' and real_root:
-        splits = get_semantickitti_splits()
-
-        train_real = SemanticKITTIDataset(
-            root=real_root,
-            sequences=splits['train'],
-            projection=projection,
-            load_labels=True,
-            cache_dir=os.path.join(data_cfg['output_root'], 'cache', 'semantickitti_train')
-            if data_cfg.get('output_root')
-            else None,
-        )
-
-        val_real = SemanticKITTIDataset(
-            root=real_root,
-            sequences=splits['val'],
-            projection=projection,
-            load_labels=True,
-            cache_dir=os.path.join(data_cfg['output_root'], 'cache', 'semantickitti_val')
-            if data_cfg.get('output_root')
-            else None,
-        )
-
-        loaders['train_real'] = DataLoader(
-            train_real,
-            batch_size=config['training']['batch_size'],
-            shuffle=True,
-            num_workers=num_workers,
-            pin_memory=True,
-        )
-
-        loaders['val_real'] = DataLoader(
-            val_real,
-            batch_size=config['evaluation']['batch_size'],
-            shuffle=False,
-            num_workers=num_workers,
-            pin_memory=True,
-        )
-
-    elif real_dataset_type == 'nuscenes_npz' and real_root:
+    if real_dataset_type == 'nuscenes_npz' and real_root:
         train_split = data_cfg.get('nuscenes_train_split', 'mini_train')
         val_split = data_cfg.get('nuscenes_val_split', 'mini_val')
 

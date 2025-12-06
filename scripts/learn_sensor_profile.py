@@ -21,21 +21,17 @@ def learn_sensor_profile(
     sequences: list = None,
 ):
     """
-    Learn sensor profile from SemanticKITTI data.
+    Learn sensor profile from real data (nuScenes or generic NPZ).
     
     Args:
-        data_root: Path to preprocessed SemanticKITTI
+        data_root: Path to preprocessed data root (containing NPZ files)
         output_path: Path to save sensor profile JSON
         num_samples: Number of scans to use
-        sequences: Sequences to use (default: train sequences)
+        sequences: Not used for NPZ folder structure
     """
     data_root = Path(data_root)
     
-    if sequences is None:
-        sequences = [f"{i:02d}" for i in [0, 1, 2, 3, 4, 5, 6, 7, 9, 10]]
-    
     print(f"Learning sensor profile from {data_root}")
-    print(f"Sequences: {sequences}")
     print(f"Samples: {num_samples}")
     
     # Collect range views
@@ -43,29 +39,27 @@ def learn_sensor_profile(
     intensity_views = []
     mask_views = []
     
-    samples_per_seq = max(1, num_samples // len(sequences))
+    # Get files directly from root
+    files = sorted(data_root.glob("*.npz"))
+    if not files:
+        # Try subdirectories if direct search failed
+        files = sorted(data_root.glob("**/*.npz"))
+        
+    if not files:
+        print(f"Error: No .npz files found in {data_root}")
+        return
+
+    # Sample uniformly
+    step = max(1, len(files) // num_samples)
+    sampled_files = files[::step][:num_samples]
     
-    for seq in sequences:
-        seq_path = data_root / "semantickitti" / seq
-        
-        if not seq_path.exists():
-            print(f"Warning: Sequence {seq} not found at {seq_path}")
-            continue
-        
-        # Get files
-        files = sorted(seq_path.glob("*.npz"))
-        
-        # Sample uniformly
-        step = max(1, len(files) // samples_per_seq)
-        sampled_files = files[::step][:samples_per_seq]
-        
-        print(f"Sequence {seq}: Using {len(sampled_files)} scans")
-        
-        for file in tqdm(sampled_files, desc=f"Loading {seq}", leave=False):
-            data = np.load(file)
-            range_views.append(data['range'])
-            intensity_views.append(data['intensity'])
-            mask_views.append(data['mask'])
+    print(f"Using {len(sampled_files)} scans")
+    
+    for file in tqdm(sampled_files, desc="Loading scans", leave=False):
+        data = np.load(file)
+        range_views.append(data['range'])
+        intensity_views.append(data['intensity'])
+        mask_views.append(data['mask'])
     
     print(f"\nLoaded {len(range_views)} scans")
     

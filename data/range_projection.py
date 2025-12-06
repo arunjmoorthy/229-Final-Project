@@ -230,9 +230,9 @@ def circular_pad_2d(tensor: torch.Tensor, pad_width: int) -> torch.Tensor:
     return torch.cat([left, tensor, right], dim=-1)
 
 
-def load_kitti_point_cloud(bin_path: str) -> Tuple[np.ndarray, np.ndarray]:
+def load_bin_point_cloud(bin_path: str) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Load KITTI format point cloud from binary file.
+    Load point cloud from binary file (KITTI/SynLiDAR format).
     
     Args:
         bin_path: Path to .bin file
@@ -247,9 +247,9 @@ def load_kitti_point_cloud(bin_path: str) -> Tuple[np.ndarray, np.ndarray]:
     return points, intensity
 
 
-def load_kitti_labels(label_path: str) -> np.ndarray:
+def load_bin_labels(label_path: str) -> np.ndarray:
     """
-    Load KITTI format semantic labels.
+    Load semantic labels from binary file (KITTI/SynLiDAR format).
     
     Args:
         label_path: Path to .label file
@@ -258,6 +258,6 @@ def load_kitti_labels(label_path: str) -> np.ndarray:
         labels: (N,) semantic class labels
     """
     labels = np.fromfile(label_path, dtype=np.uint32)
-    labels = labels & 0xFFFF  # Lower 16 bits are semantic labels
+    labels = labels & 0xFFFF
     return labels
 

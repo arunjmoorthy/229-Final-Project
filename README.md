@@ -32,7 +32,6 @@ This project implements a Sim→Real translation pipeline for LiDAR point clouds
 │   ├── metrics.py        # FRID, FPD, MMD
 │   └── visualize.py      # Visualization tools
 ├── scripts/               # Utility scripts
-│   ├── preprocess_semantickitti.py
 │   ├── preprocess_synlidar.py
 │   ├── learn_sensor_profile.py
 │   ├── translate_batch.py
@@ -55,16 +54,14 @@ modal token new
 ```
 
 3. Download datasets:
-   - SemanticKITTI: http://semantic-kitti.org/
    - SynLiDAR: https://github.com/xiaoaoran/SynLiDAR
 
 ## Usage
 
 ### Phase 1: Data Preprocessing
 ```bash
-python scripts/preprocess_semantickitti.py --data_root /path/to/semantickitti
 python scripts/preprocess_synlidar.py --data_root /path/to/synlidar
-python scripts/learn_sensor_profile.py --data_root /path/to/processed/semantickitti
+python scripts/learn_sensor_profile.py --data_root /path/to/processed/real_data
 ```
 
 ### Phase 2: Train Translator
@@ -82,7 +79,7 @@ python train/trainer.py --config config.yaml --stage diffusion --load_checkpoint
 python scripts/translate_batch.py --checkpoint checkpoints/diffusion_best.pt --input_dir synthetic --output_dir translated
 
 # Compute metrics
-python eval/metrics.py --generated_dir translated --real_dir semantickitti_val
+python eval/metrics.py --generated_dir translated --real_dir real_val
 
 # Downstream evaluation
 python scripts/eval_downstream.py --synthetic_type [raw|translated]
